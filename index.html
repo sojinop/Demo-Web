@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rolex Deepsea | Cinematic Experience</title>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    
+    <!-- Framer Motion -->
+    <script src="https://unpkg.com/framer-motion@10.16.4/dist/framer-motion.js"></script>
+    
+    <!-- Babel Standalone -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        deepblue: '#002147',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/feather-icons"></script>
+
+    <style>
+        body {
+            background: linear-gradient(to bottom, #010b1a, #00040a, #000000);
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+            font-weight: 200; /* Extra Light base */
+        }
+        
+        /* Hide scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #111a2c;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #1c2a47;
+        }
+        
+        .hide-scroll {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .hide-scroll::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+        const { useState, useEffect, useRef } = React;
+        const { motion, useScroll, useTransform, AnimatePresence } = window.Motion;
+
+        // Image Constants
+        const IMAGES = {
+            hero: "file:///C:/Users/vidhu/.gemini/antigravity/brain/e261d8e4-67ec-4d47-847c-0a5b21ef06f4/hero_watch_1778082283551.png",
+            dial: "file:///C:/Users/vidhu/.gemini/antigravity/brain/e261d8e4-67ec-4d47-847c-0a5b21ef06f4/feature_dial_1778082582927.png",
+            bezel: "file:///C:/Users/vidhu/.gemini/antigravity/brain/e261d8e4-67ec-4d47-847c-0a5b21ef06f4/feature_bezel_1778082918924.png",
+            bracelet: "file:///C:/Users/vidhu/.gemini/antigravity/brain/e261d8e4-67ec-4d47-847c-0a5b21ef06f4/feature_bracelet_1778082952587.png",
+            water: "file:///C:/Users/vidhu/.gemini/antigravity/brain/e261d8e4-67ec-4d47-847c-0a5b21ef06f4/feature_water_1778083662331.png"
+        };
+
+        // --- COMPONENTS ---
+
+        const Navbar = () => {
+            return (
+                <nav className="fixed top-0 w-full z-50 py-10 px-10 md:px-24 flex justify-between items-center text-white">
+                    <div className="font-serif text-xs md:text-sm tracking-[0.3em] uppercase">ROLEX</div>
+                    <div className="flex gap-12 text-[10px] tracking-[0.3em] uppercase font-light">
+                        <a href="#details" className="hover:text-gray-400 transition-colors">Details</a>
+                        <a href="#shop" className="hover:text-gray-400 transition-colors">Shop</a>
+                    </div>
+                </nav>
+            );
+        };
+
+        const { useMotionValueEvent } = window.Motion;
+
+        const HeroSequence = () => {
+            const containerRef = useRef(null);
+            const imgRef = useRef(null);
+            
+            const { scrollYProgress } = useScroll({
+                target: containerRef,
+                offset: ["start start", "end end"]
+            });
+
+            // Update image source on scroll
+            useMotionValueEvent(scrollYProgress, "change", (latest) => {
+                if (imgRef.current) {
+                    // Calculate frame index from 1 to 240
+                    const frame = Math.min(240, Math.max(1, Math.floor(latest * 239) + 1));
+                    const frameString = String(frame).padStart(3, '0');
+                    imgRef.current.src = `public/images/herosection/ezgif-frame-${frameString}.png`;
+                }
+            });
+
+            // Text Overlays Animations
+            const opacity1 = useTransform(scrollYProgress, [0, 0.1, 0.2, 0.3], [0, 1, 1, 0]);
+            const y1 = useTransform(scrollYProgress, [0, 0.1], [50, 0]);
+
+            const opacity2 = useTransform(scrollYProgress, [0.35, 0.45, 0.55, 0.65], [0, 1, 1, 0]);
+            const y2 = useTransform(scrollYProgress, [0.35, 0.45], [50, 0]);
+
+            const opacity3 = useTransform(scrollYProgress, [0.7, 0.8, 0.9, 1], [0, 1, 1, 0]);
+            const y3 = useTransform(scrollYProgress, [0.7, 0.8], [50, 0]);
+
+            return (
+                <div ref={containerRef} className="h-[400vh] w-full relative">
+                    <div className="sticky top-0 h-screen w-[100vw] overflow-hidden flex items-center justify-center">
+                        
+                        {/* Static Hero Title top-left */}
+                        <div className="absolute top-28 left-10 md:left-24 z-20 pointer-events-none">
+                            <p className="font-sans font-light text-[9px] tracking-[0.5em] uppercase text-gray-500">
+                                The Deepsea
+                            </p>
+                        </div>
+
+                        {/* Full-Screen Sequence Image */}
+                        <img 
+                            ref={imgRef}
+                            src="public/images/herosection/ezgif-frame-001.png" 
+                            alt="Rolex Deepsea Sequence" 
+                            className="w-[100vw] h-[100vh] object-cover object-center z-10"
+                        />
+
+                        {/* Text Overlays positioned carefully over full screen */}
+                        {/* Text Overlay 1 */}
+                        <motion.div 
+                            style={{ opacity: opacity1, y: y1 }}
+                            className="absolute bottom-20 md:bottom-32 left-10 md:left-24 z-20 pointer-events-none text-left"
+                        >
+                            <h1 className="font-serif font-extralight text-lg md:text-xl text-white mb-2 tracking-[0.2em] leading-relaxed">
+                                ULTIMATE DEPTHS
+                            </h1>
+                            <p className="font-sans font-extralight text-gray-400 tracking-[0.1em] text-[10px] leading-loose max-w-xs">
+                                The ultimate watch of the deep, perfected for the abyss.
+                            </p>
+                        </motion.div>
+
+                        {/* Text Overlay 2 */}
+                        <motion.div 
+                            style={{ opacity: opacity2, y: y2 }}
+                            className="absolute top-1/2 -translate-y-1/2 right-10 md:right-32 z-20 pointer-events-none text-right"
+                        >
+                            <h2 className="font-serif font-extralight text-lg md:text-xl text-white mb-2 tracking-[0.2em] leading-relaxed">
+                                UNRIVALED ENGINEERING
+                            </h2>
+                            <p className="font-sans font-extralight text-gray-400 tracking-[0.1em] text-[10px] leading-loose max-w-xs ml-auto">
+                                Withstands pressures that would crush a submarine. Built for extremes.
+                            </p>
+                        </motion.div>
+
+                        {/* Text Overlay 3 */}
+                        <motion.div 
+                            style={{ opacity: opacity3, y: y3 }}
+                            className="absolute bottom-20 md:bottom-32 right-10 md:right-24 z-20 pointer-events-none text-right"
+                        >
+                            <h2 className="font-serif font-extralight text-lg md:text-xl text-white mb-2 tracking-[0.2em] leading-relaxed uppercase">
+                                Oystersteel Architecture
+                            </h2>
+                            <p className="font-sans font-extralight text-gray-400 tracking-[0.1em] text-[10px] leading-loose max-w-xs ml-auto">
+                                Form and function perfectly aligned in exceptional 904L steel.
+                            </p>
+                        </motion.div>
+
+                    </div>
+                </div>
+            );
+        };
+
+        const FeatureSection = ({ image, title, description, reverse }) => {
+            const ref = useRef(null);
+            const { scrollYProgress } = useScroll({
+                target: ref,
+                offset: ["start end", "end start"]
+            });
+
+            // The image stays pinned while scrolling through the section
+            const imageScale = useTransform(scrollYProgress, [0.2, 0.5, 0.8], [0.8, 1, 1.1]);
+            const opacity = useTransform(scrollYProgress, [0.2, 0.35, 0.65, 0.8], [0, 1, 1, 0]);
+            const textY = useTransform(scrollYProgress, [0.2, 0.35], [50, 0]);
+
+            return (
+                <div ref={ref} className="h-[200vh] relative w-full">
+                    <div className="sticky top-0 h-screen w-full flex items-center overflow-hidden">
+                        <div className={`w-full px-16 md:px-32 h-full flex flex-col md:flex-row ${reverse ? 'md:flex-row-reverse' : ''} items-center justify-between`}>
+                            
+                            {/* 50% Image Container */}
+                            <motion.div 
+                                style={{ opacity, scale: imageScale }}
+                                className="flex-1 w-full flex justify-center items-center h-1/2 md:h-full"
+                            >
+                                <img 
+                                    src={image} 
+                                    alt={title}
+                                    className="max-w-[50%] md:max-w-[250px] object-contain"
+                                />
+                            </motion.div>
+                            
+                            {/* 50% Text Container */}
+                            <motion.div 
+                                style={{ opacity, y: textY }}
+                                className="flex-1 w-full text-left flex flex-col justify-center h-1/2 md:h-full md:px-24"
+                            >
+                                <h2 className="font-serif font-extralight text-lg md:text-xl mb-6 text-white leading-relaxed tracking-[0.2em] uppercase">
+                                    {title}
+                                </h2>
+                                <p className="font-sans font-extralight text-[10px] md:text-xs text-gray-400 max-w-sm leading-[2.5] tracking-widest">
+                                    {description}
+                                </p>
+                            </motion.div>
+
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const TechnicalDetails = () => {
+            const ref = useRef(null);
+            const { scrollYProgress } = useScroll({
+                target: ref,
+                offset: ["start end", "center center"]
+            });
+
+            const opacity = useTransform(scrollYProgress, [0, 1], [0, 1]);
+            const y = useTransform(scrollYProgress, [0, 1], [100, 0]);
+
+            const specs = [
+                { label: "Reference", value: "136660" },
+                { label: "Diameter", value: "44 mm" },
+                { label: "Material", value: "Oystersteel" },
+                { label: "Water Resistance", value: "3,900 m / 12,800 ft" },
+                { label: "Movement", value: "Calibre 3235" },
+                { label: "Power Reserve", value: "70 hours" }
+            ];
+
+            return (
+                <div id="details" className="min-h-screen py-32 px-16 md:px-32 flex flex-col justify-center">
+                    <motion.div 
+                        ref={ref}
+                        style={{ opacity, y }}
+                        className="w-full"
+                    >
+                        <h2 className="font-serif font-extralight text-lg md:text-xl mb-24 tracking-[0.2em] uppercase text-center text-white">Technical Specifications</h2>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-24 gap-y-16 max-w-5xl mx-auto">
+                            {specs.map((spec, i) => (
+                                <div key={i} className="pb-4">
+                                    <h4 className="text-gray-500 font-sans font-extralight tracking-[0.3em] text-[8px] mb-3 uppercase">{spec.label}</h4>
+                                    <p className="text-xs md:text-sm font-extralight tracking-widest text-white">{spec.value}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </motion.div>
+                </div>
+            );
+        };
+
+        const ShopSection = () => {
+            const ref = useRef(null);
+            const { scrollYProgress } = useScroll({
+                target: ref,
+                offset: ["start end", "center center"]
+            });
+
+            const opacity = useTransform(scrollYProgress, [0, 1], [0, 1]);
+            const scale = useTransform(scrollYProgress, [0, 1], [0.95, 1]);
+
+            return (
+                <div id="shop" className="min-h-screen py-32 px-16 md:px-32 flex items-center">
+                    <motion.div 
+                        ref={ref}
+                        style={{ opacity, scale }}
+                        className="w-full flex flex-col md:flex-row justify-center items-center"
+                    >
+                        <div className="flex-1 w-full flex justify-center">
+                            <img src={IMAGES.hero} alt="Rolex Deepsea Shop" className="max-w-[120px] md:max-w-[200px] h-auto" />
+                        </div>
+                        
+                        <div className="flex-1 w-full space-y-8 md:px-24">
+                            <h2 className="font-serif font-extralight text-lg md:text-xl tracking-[0.2em] uppercase text-white">Rolex Deepsea</h2>
+                            <p className="text-gray-400 font-extralight text-[10px] md:text-xs leading-[2.5] max-w-xs tracking-widest">
+                                The ultimate watch of the deep. Featuring the distinctive D-blue dial and built to withstand extreme depths.
+                            </p>
+                            
+                            <div className="pt-8">
+                                <p className="font-serif font-extralight text-base md:text-lg mb-8 tracking-[0.15em] text-white">₹ 1,469,600</p>
+                                <a 
+                                    href="checkout.html" 
+                                    className="inline-block bg-white text-black px-12 py-4 font-sans font-extralight text-[9px] tracking-[0.3em] uppercase hover:bg-gray-200 transition-colors"
+                                >
+                                    Purchase
+                                </a>
+                            </div>
+                            
+                            <div className="pt-12 text-[9px] font-extralight text-gray-600 flex gap-10 tracking-[0.2em] uppercase">
+                                <span className="flex items-center gap-3"><i data-feather="truck" className="w-3 h-3"></i> Complimentary Shipping</span>
+                                <span className="flex items-center gap-3"><i data-feather="shield" className="w-3 h-3"></i> 5-Year Guarantee</span>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+            );
+        };
+
+        const Footer = () => (
+            <footer className="py-20 text-center text-white">
+                <h2 className="font-serif font-extralight text-sm tracking-[0.4em] mb-6">ROLEX</h2>
+                <p className="text-gray-600 font-extralight text-[9px] tracking-widest uppercase">&copy; 2026 Rolex Demo Landing Page. Educational Purposes Only.</p>
+            </footer>
+        );
+
+        const App = () => {
+            useEffect(() => {
+                // Initialize Feather icons after render
+                if (window.feather) {
+                    window.feather.replace();
+                }
+            }, []);
+
+            return (
+                <div className="min-h-screen font-light">
+                    <Navbar />
+                    <HeroSequence />
+                    
+                    <FeatureSection 
+                        image={IMAGES.dial}
+                        title="The D-Blue Dial"
+                        description="Transitioning from twilight blue to bottomless black, celebrating James Cameron's historic solo dive."
+                        reverse={false}
+                    />
+                    
+                    <FeatureSection 
+                        image={IMAGES.bezel}
+                        title="Cerachrom Bezel"
+                        description="A 60-minute graduated insert in black ceramic allows divers to monitor their dive securely."
+                        reverse={true}
+                    />
+                    
+                    <FeatureSection 
+                        image={IMAGES.bracelet}
+                        title="The Oyster Bracelet"
+                        description="A perfect alchemy of form and function, ensuring absolute comfort and security over a diving suit."
+                        reverse={false}
+                    />
+
+                    <FeatureSection 
+                        image={IMAGES.water}
+                        title="Waterproof to 3,900m"
+                        description="The Ringlock system architecture allows the watch to withstand the colossal pressure of the ocean depths."
+                        reverse={true}
+                    />
+
+                    <TechnicalDetails />
+                    <ShopSection />
+                    <Footer />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
