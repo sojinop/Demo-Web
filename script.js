@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         addToCartBtn.addEventListener('click', () => {
             const qty = parseInt(quantityInput.value) || 1;
             const price = 1469600;
-            
+
             // Check if item exists
             const existingItem = cart.find(item => item.id === 'deepsea');
             if (existingItem) {
@@ -75,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     image: document.querySelector('.shop-main-img').src
                 });
             }
-            
+
             updateCartUI();
             toggleCart();
         });
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             cart.forEach(item => {
                 total += item.price * item.quantity;
-                
+
                 const itemEl = document.createElement('div');
                 itemEl.className = 'cart-item';
                 itemEl.innerHTML = `
@@ -114,7 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainImg = document.querySelector('.shop-main-img');
 
     thumbnails.forEach(thumb => {
-        thumb.addEventListener('click', function() {
+        thumb.addEventListener('click', function () {
             // Remove active class
             thumbnails.forEach(t => t.classList.remove('active'));
             // Add active class
