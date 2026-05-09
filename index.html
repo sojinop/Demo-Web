@@ -76,6 +76,21 @@
         .hide-scroll::-webkit-scrollbar {
             display: none;
         }
+
+        /* Mobile Orientation Overlay */
+        .orientation-overlay {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Target strictly touch devices in portrait mode */
+        @media (max-width: 1024px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
+            .orientation-overlay {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
     </style>
 </head>
 
@@ -96,6 +111,26 @@
         };
 
         // --- COMPONENTS ---
+
+        const OrientationOverlay = () => {
+            return (
+                <div className="orientation-overlay fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/80 backdrop-blur-2xl">
+                    <motion.div
+                        animate={{ rotate: 90 }}
+                        transition={{ repeat: Infinity, duration: 1.5, repeatDelay: 1, ease: "easeInOut" }}
+                        className="mb-10"
+                    >
+                        <i data-feather="smartphone" className="w-12 h-12 text-white/80"></i>
+                    </motion.div>
+                    <h2 className="font-serif font-extralight text-xl text-white tracking-[0.2em] mb-4 text-center px-8">
+                        CINEMATIC MODE
+                    </h2>
+                    <p className="font-sans font-extralight text-[10px] text-gray-400 tracking-widest text-center max-w-[250px] leading-relaxed uppercase">
+                        Rotate your device for the best experience.
+                    </p>
+                </div>
+            );
+        };
 
         const Navbar = () => {
             return (
@@ -427,9 +462,18 @@
         };
 
         const Footer = () => (
-            <footer className="py-20 text-center text-white">
+            <footer className="py-20 text-center text-white relative flex flex-col items-center">
                 <h2 className="font-serif font-extralight text-sm tracking-[0.4em] mb-6">ROLEX</h2>
-                <p className="text-gray-600 font-extralight text-[9px] tracking-widest uppercase">&copy; 2026 Rolex Demo Landing Page. Educational Purposes Only.</p>
+                <p className="text-gray-600 font-extralight text-[9px] tracking-widest uppercase mb-12">&copy; 2026 Rolex Demo Landing Page. Educational Purposes Only.</p>
+
+                {/* Premium Credit */}
+                <div className="group inline-flex items-center justify-center gap-4 opacity-40 hover:opacity-100 transition-all duration-1000 ease-in-out cursor-default">
+                    <div className="h-[1px] w-6 md:w-12 bg-gradient-to-r from-transparent to-gray-500 group-hover:to-white transition-colors duration-1000"></div>
+                    <span className="font-serif font-extralight text-[9px] md:text-[11px] tracking-[0.4em] uppercase text-gray-400 group-hover:text-white group-hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.4)] transition-all duration-1000">
+                        Crafted by Sojin
+                    </span>
+                    <div className="h-[1px] w-6 md:w-12 bg-gradient-to-l from-transparent to-gray-500 group-hover:to-white transition-colors duration-1000"></div>
+                </div>
             </footer>
         );
 
@@ -443,6 +487,7 @@
 
             return (
                 <div className="min-h-screen font-light">
+                    <OrientationOverlay />
                     <Navbar />
                     <HeroSequence />
 
