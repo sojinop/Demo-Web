@@ -77,20 +77,6 @@
             display: none;
         }
 
-        /* Mobile Orientation Overlay */
-        .orientation-overlay {
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* Target strictly touch devices in portrait mode */
-        @media (max-width: 1024px) and (orientation: portrait) and (hover: none) and (pointer: coarse) {
-            .orientation-overlay {
-                opacity: 1;
-                pointer-events: auto;
-            }
-        }
     </style>
 </head>
 
@@ -110,25 +96,73 @@
             water: "public/images/feature_water.png"
         };
 
+        // --- CUSTOM HOOKS ---
+        const useMobileOrientation = () => {
+            const [isPortrait, setIsPortrait] = useState(false);
+
+            useEffect(() => {
+                const checkOrientation = () => {
+                    // Check if it's a mobile/tablet device (excluding desktop)
+                    const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent) 
+                                     || (navigator.maxTouchPoints > 0 && window.innerWidth <= 1024);
+
+                    if (isMobile) {
+                        // Strict portrait check based on innerHeight vs innerWidth
+                        setIsPortrait(window.innerHeight > window.innerWidth);
+                    } else {
+                        // Guarantee false on desktops
+                        setIsPortrait(false);
+                    }
+                };
+
+                // Initial check
+                checkOrientation();
+
+                // Bind to resize and orientationchange events
+                window.addEventListener('resize', checkOrientation);
+                window.addEventListener('orientationchange', checkOrientation);
+
+                return () => {
+                    window.removeEventListener('resize', checkOrientation);
+                    window.removeEventListener('orientationchange', checkOrientation);
+                };
+            }, []);
+
+            return isPortrait;
+        };
+
         // --- COMPONENTS ---
 
         const OrientationOverlay = () => {
+            const isPortrait = useMobileOrientation();
+
             return (
-                <div className="orientation-overlay fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/80 backdrop-blur-2xl">
-                    <motion.div
-                        animate={{ rotate: 90 }}
-                        transition={{ repeat: Infinity, duration: 1.5, repeatDelay: 1, ease: "easeInOut" }}
-                        className="mb-10"
-                    >
-                        <i data-feather="smartphone" className="w-12 h-12 text-white/80"></i>
-                    </motion.div>
-                    <h2 className="font-serif font-extralight text-xl text-white tracking-[0.2em] mb-4 text-center px-8">
-                        CINEMATIC MODE
-                    </h2>
-                    <p className="font-sans font-extralight text-[10px] text-gray-400 tracking-widest text-center max-w-[250px] leading-relaxed uppercase">
-                        Rotate your device for the best experience.
-                    </p>
-                </div>
+                <AnimatePresence>
+                    {isPortrait && (
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.6, ease: [0.4, 0, 0.2, 1] }}
+                            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-black/80 backdrop-blur-2xl pointer-events-auto"
+                        >
+                            <motion.div
+                                animate={{ rotate: 90 }}
+                                transition={{ repeat: Infinity, duration: 1.5, repeatDelay: 1, ease: "easeInOut" }}
+                                className="mb-10"
+                            >
+                                <i data-feather="smartphone" className="w-12 h-12 text-white/80"></i>
+                            </motion.div>
+                            <h2 className="font-serif font-extralight text-xl text-white tracking-[0.2em] mb-4 text-center px-8">
+                                CINEMATIC MODE
+                            </h2>
+                            <p className="font-sans font-extralight text-[10px] text-gray-400 tracking-widest text-center max-w-[250px] leading-relaxed uppercase">
+                                Rotate your device for the best experience.
+                            </p>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             );
         };
 
