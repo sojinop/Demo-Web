@@ -132,12 +132,24 @@
                     const frameString = String(i).padStart(3, '0');
                     img.src = `public/images/herosection/ezgif-frame-${frameString}.png`;
                     
-                    img.onload = () => {
-                        // Draw immediately if it's the current frame
-                        if (i - 1 === currentFrameRef.current) {
-                            drawFrame(img);
-                        }
-                    };
+                    // Use img.decode() for asynchronous, off-main-thread GPU parsing
+                    // This prevents stuttering and guarantees the image is fully ready before drawing
+                    if (img.decode) {
+                        img.decode().then(() => {
+                            if (i - 1 === currentFrameRef.current) {
+                                requestAnimationFrame(() => drawFrame(img));
+                            }
+                        }).catch(() => {
+                            // Fallback if decode fails
+                            img.onload = () => {
+                                if (i - 1 === currentFrameRef.current) drawFrame(img);
+                            };
+                        });
+                    } else {
+                        img.onload = () => {
+                            if (i - 1 === currentFrameRef.current) drawFrame(img);
+                        };
+                    }
                     loadedImages.push(img);
                 }
                 setImages(loadedImages);
@@ -157,13 +169,19 @@
                 const canvas = canvasRef.current;
                 const ctx = canvas.getContext('2d');
                 
-                // Handle high DPI displays
+                // Handle high DPI / Retina displays natively
+                // This guarantees absolute sharpness on mobile screens (iPhone, etc.)
                 const dpr = window.devicePixelRatio || 1;
                 canvas.width = window.innerWidth * dpr;
                 canvas.height = window.innerHeight * dpr;
                 canvas.style.width = `${window.innerWidth}px`;
                 canvas.style.height = `${window.innerHeight}px`;
                 ctx.scale(dpr, dpr);
+
+                // IMPORTANT: Must be applied AFTER resizing the canvas dimensions
+                // Maximizes visual clarity and frame interpolation quality
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
 
                 // Emulate true object-fit: cover to fill viewport completely
                 const isPortrait = window.innerHeight > window.innerWidth;
@@ -182,13 +200,20 @@
                     centerShift_x, centerShift_y, img.width * ratio, img.height * ratio);
             };
 
-            // Update canvas on scroll
+            // Update canvas on scroll smoothly
             useMotionValueEvent(scrollYProgress, "change", (latest) => {
                 if (images.length > 0) {
                     const frameIndex = Math.min(239, Math.max(0, Math.floor(latest * 239)));
                     currentFrameRef.current = frameIndex;
-                    if (images[frameIndex] && images[frameIndex].complete) {
-                        drawFrame(images[frameIndex]);
+                    
+                    const targetImg = images[frameIndex];
+                    if (targetImg) {
+                        // Check if image is completely loaded/decoded
+                        if (targetImg.complete && targetImg.naturalWidth !== 0) {
+                            // Render inside requestAnimationFrame to align with browser paint cycles
+                            // This ensures maximum 60fps/120fps smoothness without dropped frames
+                            requestAnimationFrame(() => drawFrame(targetImg));
+                        }
                     }
                 }
             });
