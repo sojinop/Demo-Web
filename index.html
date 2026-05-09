@@ -165,14 +165,14 @@
                 canvas.style.height = `${window.innerHeight}px`;
                 ctx.scale(dpr, dpr);
 
-                // Emulate object-fit: cover with orientation awareness
+                // Emulate true object-fit: cover to fill viewport completely
                 const isPortrait = window.innerHeight > window.innerWidth;
                 const hRatio = window.innerWidth / img.width;
                 const vRatio = window.innerHeight / img.height;
                 
-                // For portrait, we scale it down slightly so the watch isn't massively cropped,
-                // while blending the top and bottom with the gradient background.
-                const ratio = isPortrait ? Math.max(hRatio * 2.2, vRatio * 0.5) : Math.max(hRatio, vRatio);
+                // Use max ratio to ensure the image covers the entire screen (no black bars),
+                // keeping the cinematic feel.
+                const ratio = Math.max(hRatio, vRatio);
                 
                 const centerShift_x = (window.innerWidth - img.width * ratio) / 2;
                 const centerShift_y = (window.innerHeight - img.height * ratio) / 2;
